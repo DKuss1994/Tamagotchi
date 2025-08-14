@@ -1,0 +1,159 @@
+
+class Tamagotchi ():
+  def __init__ (self,name) :
+    self.name = name
+    self.gesundheit = 100
+    self.hunger = 0
+    self.müdigkeit = 0
+    self.stimmung = 50 # 0 = traurig/ 100 Mega glücklich
+    self.alter = 0
+    self.energie = 100
+    self.lebens_timer = 0
+    self.runden_zaehler = 0
+    self.lebens_timer = 0
+
+
+
+    self.begrüssung()
+
+    # Ist der Interne Rundezähler im vom Tamagotchi um Sachen zu erhöhen oder zu reduzieren
+  def älter_werden(self):
+    self.runden_zaehler += 1
+    if self.runden_zaehler == 5:
+      self.runden_zaehler = 0
+      self.alter += 1
+      print (f"{self.name} ist ein Tag älter geworden.")
+    
+  # Das soll nur dafür da sein damit keiner der Statuswerte über oder unter 0 oder 100 geht.
+  def statuswert_nicht_unter_0_nicht_über_100 (self):
+    if self.gesundheit < 0:
+      self.gesundheit = 0
+    if self.gesundheit >= 100:
+      self.gesundheit = 100
+    if self.hunger < 0:
+      self.hunger = 0
+    if self.hunger >=100:
+      self.hunger = 100
+    if self.müdigkeit < 0:
+      self.müdigkeit = 0
+    if self.müdigkeit >= 100:
+      self.müdigkeit = 100
+    if self.stimmung < 0:
+      self.stimmung = 0
+    if self.stimmung >= 100:
+      self.stimmung = 0
+    if self.energie < 0 :
+      self.energie = 0
+    if self.energie >= 100:
+      self.energie = 100
+    
+    
+  
+  # Wenn ein bestimmter wert eventuell stimmung 3 Runden lang unter Null ist und Gesundheit 3 Runden lang unter Null ist tot
+  def tot (self):
+  
+    if self.gesundheit == 0:
+      lebens_timer += 1
+      if timer == 2:
+        print (f"{self.name} ist tot")
+        return False
+    else:
+      lebens_timer = 0
+      return True
+
+    
+  # Die Gesundheit soll langsam abfallen eventuelle mit einer Json datei arbeiten.Ich mach das wie mit dem älter werden. 
+  # Lösung eventuell so wie mit dem Älter werden nur vielleich kürzer alle 2 Runden nimmt Gesundheit 10 Punkte ab.
+  def gesundheit(self):
+    pass
+    #Eventuell später die funktion Arzt einbauen. Wenn Gesundheit bei 0 ist.
+
+  #Um Müdigkeit zu senken und Energie zu bekommen
+  def schlafen(self):
+    # Hier ist das Tamagotich nicht müde und schläft nicht und seine stimmung nimmt ab
+    if self.müdigkeit <= 25:
+      print(f"{self.name} ist nicht Müde und will noch nicht schlafen." )
+      self.stimmung -= 10
+      #Hier schläft er wiederwillig. Müdigkeit geht nur langsam runt dafür die Stimmung auch
+    elif self.müdigkeit <=50:
+      print(f"{self.name} ist nicht wirklich müde.")
+      print("brrrrBrrrrbrrrr")
+      self.müdigkeit -= 10
+      self.stimmung -=10
+      # Er ist erledigt und schläft ein
+    else:
+      self.müdigkeit -= 30
+      print(f"{self.name} ist müde und schläft ein." )
+      print("ZzzzzZzzzzZzzzz")
+    if self.stimmung == 0:
+      print("ROAR")
+      print (f"{self.name} ist mega wütend!")
+    
+    #if self.stimmung < 
+
+
+  
+    
+    
+  # Um Hunger zu reduzieren
+  def essen(self):
+    if self.hunger >= 70:
+      pass
+  # Glücklichkeit steigern Energier Reduzieren. Müdigkeit erhöhen
+  def spielen(self):
+    pass
+  # Glücklichkeit erhöhen Müdigkeit eröhen
+  def streicheln(self):
+    pass
+  
+  def stautusanzeigen(self):
+    print(f"Statuswerte von {self.name}: ")
+    print (f"Gesundheit: {self.gesundheit} ")
+    print (f"Energie: {self.energie} ")
+    print (f"Müdigkeit: {self.müdigkeit} ")
+    print (f"Hunger: {self.hunger} ")
+    print (f"Stimmung: {self.stimmung} ")
+    print(f"Alter: {self.alter} {'Tag' if self.alter == 1 else 'Tage'}")   
+
+
+  def start(self):
+    print(f"Was möchtest du mit {self.name} machen? ")
+    tuen = input("Schlafen/Essen/Spielen/Streicheln/Status ")
+    if tuen == "Schlafen":
+      self.schlafen()
+    elif tuen == "Essen":
+      self.essen()
+    elif tuen == "Spielen":
+      self.spielen()
+    elif tuen == "Streicheln":
+      self.streicheln()
+    elif tuen == "Status":
+      self.stautusanzeigen()
+    if self.stimmung == 0:
+
+        print("ROAR")
+        print (f"{self.name} ist mega wütend. Tue was dagegen")
+      #Gesundheit senken durch Wut.
+        self.gesundheit -= 40
+    self.älter_werden()
+    self.statuswert_nicht_unter_0_nicht_über_100()
+    
+  def begrüssung (self):
+    print(f"{self.name} ist ein guter Name. Kümmer dich gut um {self.name}.")
+
+# Hauptspiel
+def main():
+    print("Hallo und Herzlich Willkommen bei meinem Tamagotchi Projekt")
+    name = input ("Wie möchtest du dein Tamagotchi nennen? ")
+    tamagotchi1 = Tamagotchi(name)
+    while True:
+        tamagotchi1.start() #Aufruf der Start-Methode für das Tamagotchi
+        
+
+
+        
+
+
+main()
+  
+
