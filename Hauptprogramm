@@ -3,26 +3,26 @@ class Tamagotchi ():
   def __init__ (self,name) :
     self.name = name
     self.gesundheit = 100
-    self.hunger = 0
+    self.hunger = 100
     self.müdigkeit = 0
     self.stimmung = 50 # 0 = traurig/ 100 Mega glücklich
     self.alter = 0
     self.energie = 100
     self.lebens_timer = 0
-    self.runden_zaehler = 0
-    self.lebens_timer = 0
-
-
-
-    self.begrüssung()
+    self.runden_zaehler_alter = 0
+    self.runden_zaehler_gesundheit = 0 
+    
 
     # Ist der Interne Rundezähler im vom Tamagotchi um Sachen zu erhöhen oder zu reduzieren
   def älter_werden(self):
-    self.runden_zaehler += 1
-    if self.runden_zaehler == 5:
-      self.runden_zaehler = 0
+    self.runden_zaehler_alter += 1
+    if self.runden_zaehler_alter == 5:
+      self.runden_zaehler_alter = 0
       self.alter += 1
       print (f"{self.name} ist ein Tag älter geworden.")
+   
+    
+      
     
   # Das soll nur dafür da sein damit keiner der Statuswerte über oder unter 0 oder 100 geht.
   def statuswert_nicht_unter_0_nicht_über_100 (self):
@@ -41,7 +41,7 @@ class Tamagotchi ():
     if self.stimmung < 0:
       self.stimmung = 0
     if self.stimmung >= 100:
-      self.stimmung = 0
+      self.stimmung = 100
     if self.energie < 0 :
       self.energie = 0
     if self.energie >= 100:
@@ -51,24 +51,30 @@ class Tamagotchi ():
   
   # Wenn ein bestimmter wert eventuell stimmung 3 Runden lang unter Null ist und Gesundheit 3 Runden lang unter Null ist tot
   def tot (self):
-  
+     #Das hier ist nur ein Test, später löschen
     if self.gesundheit == 0:
-      lebens_timer += 1
-      if timer == 2:
+      self.lebens_timer += 1
+      if self.lebens_timer >= 2:
         print (f"{self.name} ist tot")
-        return False
+        return True
     else:
-      lebens_timer = 0
-      return True
+      self.lebens_timer = 0
+      return False
+    
 
     
   # Die Gesundheit soll langsam abfallen eventuelle mit einer Json datei arbeiten.Ich mach das wie mit dem älter werden. 
-  # Lösung eventuell so wie mit dem Älter werden nur vielleich kürzer alle 2 Runden nimmt Gesundheit 10 Punkte ab.
-  def gesundheit(self):
-    pass
+  # Lösung eventuell so wie mit dem Älter werden nur vielleich kürzer alle 2 Runden nimmt Gesundheit 10 Punkte ab.  # Hier wird die Gesundheit immer nach 2 Runden runter gezählt
+  def gesundheit_senkung(self):
+    self.runden_zaehler_gesundheit += 1
+    if self.runden_zaehler_gesundheit == 3 and self.stimmung <= 50:
+      self.gesundheit -= 10
+      self.runden_zaehler_gesundheit = 0
+    
     #Eventuell später die funktion Arzt einbauen. Wenn Gesundheit bei 0 ist.
 
   #Um Müdigkeit zu senken und Energie zu bekommen
+  #Funktioniert
   def schlafen(self):
     # Hier ist das Tamagotich nicht müde und schläft nicht und seine stimmung nimmt ab
     if self.müdigkeit <= 25:
@@ -83,13 +89,10 @@ class Tamagotchi ():
       # Er ist erledigt und schläft ein
     else:
       self.müdigkeit -= 30
+      self.energie += 15
       print(f"{self.name} ist müde und schläft ein." )
       print("ZzzzzZzzzzZzzzz")
-    if self.stimmung == 0:
-      print("ROAR")
-      print (f"{self.name} ist mega wütend!")
-    
-    #if self.stimmung < 
+
 
 
   
@@ -97,14 +100,64 @@ class Tamagotchi ():
     
   # Um Hunger zu reduzieren
   def essen(self):
+    # Hat Großen Hunger.
     if self.hunger >= 70:
-      pass
+      self.hunger -= 40
+      self.stimmung += 20
+      self.energie += 20
+      print(f"{self.name} isst sich richtig Satt und ist Glücklich." )
+      # Es geht so mit dem Hunger
+    elif self.hunger >= 50:
+      self.hunger -= 20
+      self.stimmung += 10
+      self.energie += 10
+      # Es zwingt sich zum Essen was nicht gesund ist
+    elif self.hunger >= 30:
+      self.hunger -= 10
+      print (f"{self.name} ist nicht hungrig, aber für dich drückt er sich das essen noch rein.")
+      self.stimmung -= 10
+      self.gesundheit -= 10
+      # Er will nichts essen
+    else:
+      print(f"{self.name} ist nicht hungrig!")
+      self.stimmung -= 20
+    
+
+
+      
+
+
+      
   # Glücklichkeit steigern Energier Reduzieren. Müdigkeit erhöhen
   def spielen(self):
-    pass
+    if self.energie >= 70:
+      self.energie -= 30
+      self.müdigkeit += 10
+      self.hunger += 10
+      self.gesundheit += 20
+      print(f"{self.name} hat großen Spaß mit dir und freut sich einfach.")
+    elif self.energie >= 50:
+      self.energie -= 30
+      self.müdigkeit += 20
+      self.hunger += 20
+      self.gesundheit += 20
+      print(f"{self.name} hat  Spaß ist doch erledigt.")
+    else:
+      # Evntuell ein Randomizier erstellen der unterschiedlichen Text ausgibt und würfelt ob man sich verletzt oder nicht
+      self.energie -= 30
+      self.müdigkeit += 40
+      self.hunger += 30
+      self.gesundheit -= 20
+      print(f"{self.name} hat sich beim Spielen verletzt.")
+
+
+      
+
+    
   # Glücklichkeit erhöhen Müdigkeit eröhen
   def streicheln(self):
-    pass
+    self.stimmung += 10
+    self.müdigkeit += 20
   
   def stautusanzeigen(self):
     print(f"Statuswerte von {self.name}: ")
@@ -130,24 +183,30 @@ class Tamagotchi ():
     elif tuen == "Status":
       self.stautusanzeigen()
     if self.stimmung == 0:
-
         print("ROAR")
         print (f"{self.name} ist mega wütend. Tue was dagegen")
       #Gesundheit senken durch Wut.
         self.gesundheit -= 40
     self.älter_werden()
     self.statuswert_nicht_unter_0_nicht_über_100()
+    self.gesundheit_senkung()
     
-  def begrüssung (self):
-    print(f"{self.name} ist ein guter Name. Kümmer dich gut um {self.name}.")
+def begrüssung (name):
+  print(f"{name} ist ein guter Name. Kümmer dich gut um {name}.")
+  
+
+  
 
 # Hauptspiel
 def main():
     print("Hallo und Herzlich Willkommen bei meinem Tamagotchi Projekt")
     name = input ("Wie möchtest du dein Tamagotchi nennen? ")
     tamagotchi1 = Tamagotchi(name)
+    begrüssung(name)
     while True:
         tamagotchi1.start() #Aufruf der Start-Methode für das Tamagotchi
+        if  tamagotchi1.tot(): # Beendet das Spiel, wenn der Tamagotch tot ist.
+          break
         
 
 
