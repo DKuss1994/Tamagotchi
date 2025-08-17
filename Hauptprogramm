@@ -1,6 +1,8 @@
-
+import random
+import json
 class Tamagotchi ():
   def __init__ (self,name) :
+
     self.name = name
     self.gesundheit = 100
     self.hunger = 100
@@ -11,19 +13,78 @@ class Tamagotchi ():
     self.lebens_timer = 0
     self.runden_zaehler_alter = 0
     self.runden_zaehler_gesundheit = 0 
-    
+    self.zustand = "gesund"
+  
+  def auspowern(self):
+    if self.zustand == "freudig":
+      pass
 
-    # Ist der Interne Rundezähler im vom Tamagotchi um Sachen zu erhöhen oder zu reduzieren
+  #Hier schaltet man den Arztbesuch frei, wenn man den Zustand krank oder den zustand verletzt hat.      Ist Fertig und funktioniert
+  def Arzt(self):
+    zufallzahl = random.randint (1,100)
+    if self.zustand == "krank" or self.zustand == "verletzt":
+      print(f"{self.name} ist immer noch {self.zustand}.")
+      arztbesuch = input ("Willst du mit Ihm zum Arzt? ja/nein ")
+      if arztbesuch == "ja":
+        if zufallzahl <= 80:
+          self.zustand = "gesund"
+          print(f"{self.name} geht es wieder super. Der Artz besuch hat geholfen.")
+        else:
+          print(f"Der Arzt besuch hat wohl nicht geholfen. {self.name} ist immer noch {self.zustand}.")
+  #Hier werden die Zustände vergeben nach einer bestimmten zeit
+  def zufallsereignis(self):
+    # Ereignisse und ihre Gewichtung
+    ereignisse = {"krank": 10, "verletzt":10,"freudig":50, "langweilig":30 }
+    ereignis = random.choices(list(ereignisse.keys()), weights=list(ereignisse.values()), k=1)[0]
+
+    # Hier ist die Option, wenn das Tamagotchi älter wird ändern sich die wahrscheinlichkeiten.
+    if self.alter > 5:
+
+      #Hier kommt noch der zustand ruhe hinzu
+      ereignisse ["ruhe"] = 10
+      ereignisse ["krank"] = 20
+      ereignisse ["verletzt"] = 20
+      ereignisse ["freudig"] = 30
+      ereignisse ["langweilig"] = 10
+
+    elif self.alter > 10:
+      del ereignisse ["langweilig"]
+      ereignisse ["ruhe"] = 20
+      ereignisse ["krank"] = 30
+      ereignisse ["verletzt"] = 30
+      ereignisse ["freudig"] = 20
+
+    if self.zustand == "gesund" and self.runden_zaehler_alter == 4:
+      if ereignis == "krank":
+        self.gesundheit -= 20
+        self.stimmung -= 10
+        print(f"{self.name} ist krank geworden")
+        self.zustand = "krank" 
+        # Hie bekommt man den zustand verletzt
+      elif ereignis == "verletzt":
+        self.gesundheit -= 15
+        print(f"{self.name} hat sich beim spielen verletzt")
+        self.zustand = "verletzt"
+        # Hier bekommt man den zustand freudig.
+      elif ereignis == "freudig":
+        self.stimmung += 20
+        self.energie -= 10
+        print (f"{self.name} ist einfach Glücklich")
+        self.zustand = "freudig"
+      elif ereignis == "langweilig":
+        self.stimmung -= 10
+        self.energie -= 10
+        print (f"{self.name} ist langweilig")
+      elif ereignis == "ruhe":
+        self.energie += 15
+        (f"{self.name} entspannt sich.")
+  # Ist der Interne Rundezähler im vom Tamagotchi um Sachen zu erhöhen oder zu reduzieren Ist fertig und Funktioniert
   def älter_werden(self):
     self.runden_zaehler_alter += 1
     if self.runden_zaehler_alter == 5:
       self.runden_zaehler_alter = 0
       self.alter += 1
       print (f"{self.name} ist ein Tag älter geworden.")
-   
-    
-      
-    
   # Das soll nur dafür da sein damit keiner der Statuswerte über oder unter 0 oder 100 geht.
   def statuswert_nicht_unter_0_nicht_über_100 (self):
     if self.gesundheit < 0:
@@ -46,10 +107,7 @@ class Tamagotchi ():
       self.energie = 0
     if self.energie >= 100:
       self.energie = 100
-    
-    
-  
-  # Wenn ein bestimmter wert eventuell stimmung 3 Runden lang unter Null ist und Gesundheit 3 Runden lang unter Null ist tot
+  # Wenn ein bestimmter wert eventuell stimmung 3 Runden lang unter Null ist und Gesundheit 3 Runden lang unter Null ist tot. Funktioniert
   def tot (self):
      #Das hier ist nur ein Test, später löschen
     if self.gesundheit == 0:
@@ -60,26 +118,36 @@ class Tamagotchi ():
     else:
       self.lebens_timer = 0
       return False
-    
-
-    
-  # Die Gesundheit soll langsam abfallen eventuelle mit einer Json datei arbeiten.Ich mach das wie mit dem älter werden. 
-  # Lösung eventuell so wie mit dem Älter werden nur vielleich kürzer alle 2 Runden nimmt Gesundheit 10 Punkte ab.  # Hier wird die Gesundheit immer nach 2 Runden runter gezählt
+  #Hier wird die Gesundheit gesenkt.
   def gesundheit_senkung(self):
     self.runden_zaehler_gesundheit += 1
     if self.runden_zaehler_gesundheit == 3 and self.stimmung <= 50:
       self.gesundheit -= 10
       self.runden_zaehler_gesundheit = 0
-    
+    elif self.runden_zaehler_gesundheit == 3:
+      self.gesundheit -= 5
+      self.runden_zaehler_gesundheit = 0
+  #Alle 2 Runden Hunger dazu.
+  def hunger_bekommen (self):
+    if self.runden_zaehler_gesundheit == 2:
+      self.hunger += 10
     #Eventuell später die funktion Arzt einbauen. Wenn Gesundheit bei 0 ist.
-
-  #Um Müdigkeit zu senken und Energie zu bekommen
-  #Funktioniert
+  #Um Müdigkeit zu senken und Energie zu bekommen. Mit auch Zuständen.
   def schlafen(self):
-    # Hier ist das Tamagotich nicht müde und schläft nicht und seine stimmung nimmt ab
-    if self.müdigkeit <= 25:
-      print(f"{self.name} ist nicht Müde und will noch nicht schlafen." )
+    zufall_text = random.randint (1,10)
+    if self.zustand == "krank" or self.zustand == "verletzt":
+      print(f"{self.name} hat der Schlaf gut getan, aber er ist immer noch {self.zustand}.")
+      self.müdigkeit -= 30
+      self.energie += 10
+      self.gesundheit += 10
+      # Hier ist das Tamagotich nicht müde und schläft nicht und seine stimmung nimmt ab
+    elif self.müdigkeit <= 25:
       self.stimmung -= 10
+      if zufall_text <= 7:
+        print(f"{self.name} ist nicht Müde und will noch nicht schlafen.")
+      else:
+        print(f"{self.name} schreit ist wüten" )
+        self.stimmung -= 10
       #Hier schläft er wiederwillig. Müdigkeit geht nur langsam runt dafür die Stimmung auch
     elif self.müdigkeit <=50:
       print(f"{self.name} ist nicht wirklich müde.")
@@ -92,16 +160,12 @@ class Tamagotchi ():
       self.energie += 15
       print(f"{self.name} ist müde und schläft ein." )
       print("ZzzzzZzzzzZzzzz")
-
-
-
-  
-    
-    
   # Um Hunger zu reduzieren
   def essen(self):
+    if self.zustand == "verletzt" or self.zustand == "krank":
+      print(f"{self.name} braucht das Essen wirklich, aber er ist immer noch{self.zustand}." )
     # Hat Großen Hunger.
-    if self.hunger >= 70:
+    elif self.hunger >= 70:
       self.hunger -= 40
       self.stimmung += 20
       self.energie += 20
@@ -121,44 +185,104 @@ class Tamagotchi ():
     else:
       print(f"{self.name} ist nicht hungrig!")
       self.stimmung -= 20
-    
-
-
-      
-
-
-      
   # Glücklichkeit steigern Energier Reduzieren. Müdigkeit erhöhen
   def spielen(self):
-    if self.energie >= 70:
+    zufall_text = random.randint (1,3)
+    #Hier passieren die Sachen, wenn man verletzt ist und trotzdem spielt.
+    if self.zustand == "verletzt":
+      if zufall_text <=2:
+        print(f"{self.name} tut sich richtig weh beim Spielen")
+        self.gesundheit -= 40
+        self.energie -= 30
+        self.stimmung -= 20
+      else:
+        print (f" Noch einmal glück gehabt. Was hätte {self.name} sich verletzt" )
+        self.energie -= 40
+        self.müdigkeit += 10
+    # Hier passieren die Sachen, wenn man krank ist und trotzdem spielt
+    elif self.zustand == "krank":
+      if zufall_text == 1 :
+        print(f"{self.name} fühlt sich nicht gut.")
+      elif zufall_text == 2 :
+        print(f"{self.name} übergibt sich.")
+      elif zufall_text == 3 :
+        print(f"{self.name} bricht zusammen.")
+      self.gesundheit -= 30
+      self.energie -= 10
+      self.stimmung -= 20
+    # Hier passieren Sachen wenn man freudig ist und spielt oder langeweile hat
+    elif self.zustand == "freudig" or self.zustand == "langweilig":
+      self.zustand = "gesund"
+      self.gesundheit += 20
+      self.stimmung += 40
+      self.energie -=10
+      self.müdigkeit += 10
+      if zufall_text == 1:
+        print(f"Wooohooo! {self.name} ist total glücklich!")
+      elif zufall_text == 2:
+        print(f"Toll! {self.name} ist voller Energie!")
+      else:
+        print(f"Super! {self.name} hat richtig viel Spaß!")
+
+
+    elif self.energie >= 70:
+      if zufall_text == 1 :
+        print(f"{self.name} hat großen Spaß mit dir und freut sich einfach.")
+      elif zufall_text == 2 :
+        print(f"{self.name} spielt gerne mit dir.")
+      elif zufall_text == 3 :
+        print(f"{self.name} verbringt gerne Zeit mit dir.")
       self.energie -= 30
       self.müdigkeit += 10
       self.hunger += 10
       self.gesundheit += 20
-      print(f"{self.name} hat großen Spaß mit dir und freut sich einfach.")
     elif self.energie >= 50:
       self.energie -= 30
       self.müdigkeit += 20
       self.hunger += 20
       self.gesundheit += 20
-      print(f"{self.name} hat  Spaß ist doch erledigt.")
+      print(f"{self.name} hat  Spaß ist, aber doch erledigt.")
     else:
-      # Evntuell ein Randomizier erstellen der unterschiedlichen Text ausgibt und würfelt ob man sich verletzt oder nicht
+      
       self.energie -= 30
       self.müdigkeit += 40
       self.hunger += 30
       self.gesundheit -= 20
-      print(f"{self.name} hat sich beim Spielen verletzt.")
-
-
-      
-
-    
+      print(f"{self.name} hat  sich beim Spielen verletzt") 
+      self.zustand = "verletzt"
   # Glücklichkeit erhöhen Müdigkeit eröhen
   def streicheln(self):
-    self.stimmung += 10
-    self.müdigkeit += 20
-  
+    # Hier bauen wir eine Wahrscheinlickeit ein ob das Tamagotich sich im krankheitszustand darüber freut oder nicht
+    zufall_text = random.randint (1,10)
+    if self.stimmung == "krank" and zufall_text <= 7:
+      self.stimmung += 10
+      self.müdigkeit += 20
+      self.gesundheit += 10
+      print (f"{self.name} ist glücklich, dass du für ihn da bist.") 
+    elif self.stimmung == "krank" and zufall_text <= 10:
+      print (f"{self.name} geht´s richtig schlecht.") 
+      self.stimmung -= 10
+      self.müdigkeit -= 10
+      self.gesundheit -= 5
+    elif self.stimmung == "verletzt" and zufall_text <= 8:
+      print (f"Das streicheln lässt {self.name} die Verletzung vergessen." )
+      self.stimmung += 10
+      self.müdigkeit += 10
+      self.gesundheit += 20
+    elif self.stimmung == "verletzt" and zufall_text <= 10:
+      print (f"{self.name} tut alles weh." )
+      self.stimmung -= 10
+      self.müdigkeit -= 10
+      self.gesundheit -= 10
+    elif zufall_text >= 5:
+      self.stimmung += 10
+      self.müdigkeit += 20
+      print(f"{self.name} freut sich über die Streicheleinheit von dir.") 
+    else:
+      self.stimmung += 10
+      self.müdigkeit += 20
+      print(f"{self.name} ist sehr entspannt. ") 
+  # Hier werden die Statuswerte angezeigt
   def stautusanzeigen(self):
     print(f"Statuswerte von {self.name}: ")
     print (f"Gesundheit: {self.gesundheit} ")
@@ -166,37 +290,44 @@ class Tamagotchi ():
     print (f"Müdigkeit: {self.müdigkeit} ")
     print (f"Hunger: {self.hunger} ")
     print (f"Stimmung: {self.stimmung} ")
+    print (f"Zustand: {self.zustand} ")
     print(f"Alter: {self.alter} {'Tag' if self.alter == 1 else 'Tage'}")   
-
-
+# Hier wird alles für das Programm eingefügt
   def start(self):
-    print(f"Was möchtest du mit {self.name} machen? ")
-    tuen = input("Schlafen/Essen/Spielen/Streicheln/Status ")
-    if tuen == "Schlafen":
-      self.schlafen()
-    elif tuen == "Essen":
-      self.essen()
-    elif tuen == "Spielen":
-      self.spielen()
-    elif tuen == "Streicheln":
-      self.streicheln()
-    elif tuen == "Status":
-      self.stautusanzeigen()
+    self.statuswert_nicht_unter_0_nicht_über_100()
+    richtige_eingabe = False
+    while not richtige_eingabe:
+      print(f"Was möchtest du mit {self.name} machen? ")
+      tuen = input("Schlafen/Essen/Spielen/Streicheln/Status ").lower()
+      if tuen == "schlafen":
+        richtige_eingabe = True
+        self.schlafen()
+      elif tuen == "essen":
+        richtige_eingabe = True
+        self.essen()
+      elif tuen == "spielen":
+        richtige_eingabe = True
+        self.spielen()
+      elif tuen == "streicheln":
+        richtige_eingabe = True
+        self.streicheln()
+      elif tuen == "status":
+        richtige_eingabe = True
+        self.stautusanzeigen()
+      else: 
+        print("Deine Eingabe ist Fehlerhaft!")
     if self.stimmung == 0:
         print("ROAR")
-        print (f"{self.name} ist mega wütend. Tue was dagegen")
+        print (f"{self.name} ist mega wütend. Tue was dagegen").lower()
       #Gesundheit senken durch Wut.
-        self.gesundheit -= 40
+        self.gesundheit -= 20
     self.älter_werden()
-    self.statuswert_nicht_unter_0_nicht_über_100()
     self.gesundheit_senkung()
-    
+    self.zufallsereignis()
+    self.Arzt()
+    self.hunger_bekommen()
 def begrüssung (name):
   print(f"{name} ist ein guter Name. Kümmer dich gut um {name}.")
-  
-
-  
-
 # Hauptspiel
 def main():
     print("Hallo und Herzlich Willkommen bei meinem Tamagotchi Projekt")
@@ -207,12 +338,4 @@ def main():
         tamagotchi1.start() #Aufruf der Start-Methode für das Tamagotchi
         if  tamagotchi1.tot(): # Beendet das Spiel, wenn der Tamagotch tot ist.
           break
-        
-
-
-        
-
-
 main()
-  
-
