@@ -14,20 +14,18 @@ class Tamagotchi ():
     self.runden_zaehler_alter = 0
     self.runden_zaehler_gesundheit = 0 
     self.zustand = "gesund"
-  
-  def auspowern(self):
-    if self.zustand == "freudig":
-      pass
 
   #Hier schaltet man den Arztbesuch frei, wenn man den Zustand krank oder den zustand verletzt hat.      Ist Fertig und funktioniert
   def Arzt(self):
     zufallzahl = random.randint (1,100)
     if self.zustand == "krank" or self.zustand == "verletzt":
       print(f"{self.name} ist immer noch {self.zustand}.")
-      arztbesuch = input ("Willst du mit Ihm zum Arzt? ja/nein ")
+      arztbesuch = input ("Willst du mit Ihm zum Arzt? ja/nein ").lower()
       if arztbesuch == "ja":
         if zufallzahl <= 80:
           self.zustand = "gesund"
+          self.gesundheit += 30
+          self.stimung += 20
           print(f"{self.name} geht es wieder super. Der Artz besuch hat geholfen.")
         else:
           print(f"Der Arzt besuch hat wohl nicht geholfen. {self.name} ist immer noch {self.zustand}.")
@@ -38,7 +36,7 @@ class Tamagotchi ():
     ereignis = random.choices(list(ereignisse.keys()), weights=list(ereignisse.values()), k=1)[0]
 
     # Hier ist die Option, wenn das Tamagotchi älter wird ändern sich die wahrscheinlichkeiten.
-    if self.alter > 5:
+    if self.alter > 10:
 
       #Hier kommt noch der zustand ruhe hinzu
       ereignisse ["ruhe"] = 10
@@ -47,7 +45,7 @@ class Tamagotchi ():
       ereignisse ["freudig"] = 30
       ereignisse ["langweilig"] = 10
 
-    elif self.alter > 10:
+    elif self.alter > 5:
       del ereignisse ["langweilig"]
       ereignisse ["ruhe"] = 20
       ereignisse ["krank"] = 30
@@ -254,22 +252,22 @@ class Tamagotchi ():
   def streicheln(self):
     # Hier bauen wir eine Wahrscheinlickeit ein ob das Tamagotich sich im krankheitszustand darüber freut oder nicht
     zufall_text = random.randint (1,10)
-    if self.stimmung == "krank" and zufall_text <= 7:
+    if self.zustand == "krank" and zufall_text <= 7:
       self.stimmung += 10
       self.müdigkeit += 20
       self.gesundheit += 10
       print (f"{self.name} ist glücklich, dass du für ihn da bist.") 
-    elif self.stimmung == "krank" and zufall_text <= 10:
+    elif self.zustand == "krank" and zufall_text <= 10:
       print (f"{self.name} geht´s richtig schlecht.") 
       self.stimmung -= 10
       self.müdigkeit -= 10
       self.gesundheit -= 5
-    elif self.stimmung == "verletzt" and zufall_text <= 8:
+    elif self.zustand == "verletzt" and zufall_text <= 8:
       print (f"Das streicheln lässt {self.name} die Verletzung vergessen." )
       self.stimmung += 10
       self.müdigkeit += 10
       self.gesundheit += 20
-    elif self.stimmung == "verletzt" and zufall_text <= 10:
+    elif self.zustand == "verletzt" and zufall_text <= 10:
       print (f"{self.name} tut alles weh." )
       self.stimmung -= 10
       self.müdigkeit -= 10
@@ -339,3 +337,5 @@ def main():
         if  tamagotchi1.tot(): # Beendet das Spiel, wenn der Tamagotch tot ist.
           break
 main()
+  
+
