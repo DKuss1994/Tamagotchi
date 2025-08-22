@@ -1,9 +1,10 @@
 import random
 import json
+import os # Dafür da um zu prüfen ob es ein Speicherstand gibt
 class Tamagotchi ():
-  def __init__ (self,name) :
+  def __init__ (self) :
 
-    self.name = name
+    self.name = ""
     self.gesundheit = 100
     self.hunger = 100
     self.müdigkeit = 0
@@ -14,9 +15,34 @@ class Tamagotchi ():
     self.runden_zaehler_alter = 0
     self.runden_zaehler_gesundheit = 0 
     self.zustand = "gesund"
-  
+  def namen_geben (self):
+    self.name = input ("Wie möchtest du dein Tamagotchi nennen? ")
+  def laden (self):
+    if os.path.exists("speichern.json"): #Hier wird geprüft ob es ein Spielstand gibt
+      tuen = input("Möchtest du den Spielstand laden? (ja/nein) ").strip().lower()
+      if tuen in ["ja","yes","y","j","jap"]:
+        with open ("speichern.json", "r") as file:
+          daten = json.load(file)
+          self.name = daten["name"]
+          self.gesundheit = daten["gesundheit"]
+          self.hunger = daten["hunger"]
+          self.müdigkeit = daten["müdigkeit"]
+          self.stimmung = daten["stimmung"] 
+          self.alter = daten["alter"]
+          self.energie = daten["energie"]
+          self.lebens_timer = daten["lebens_timer"]
+          self.runden_zaehler_alter = daten["runden_zaehler_alter"]
+          self.runden_zaehler_gesundheit = daten["runden_zaehler_gesundheit"] 
+          self.zustand = daten["zustand"]
+          print("Spielstand erfolgreich geladen")
+          self.status_anzeige()
+      else:
+        print ("Neues Spiel wird gestatet")
+    else:
+      print("Kein gespeicherter Spielstand gefunden – es wird ein neues Spiel gestartet.")
   def speichern (self):
     speichern = {
+      "name" : self.name,
       "gesundheit": self.gesundheit,
       "hunger": self.hunger,
       "müdigkeit": self.müdigkeit,
@@ -29,8 +55,6 @@ class Tamagotchi ():
       "zustand": self.zustand}
     with open ("speichern.json", "w") as file:
       json.dump(speichern, file, indent=2)
-
-
   #Hier schaltet man den Arztbesuch frei, wenn man den Zustand krank oder den zustand verletzt hat.      Ist Fertig und funktioniert
   def Arzt(self):
     zufallzahl = random.randint (1,100)
@@ -50,10 +74,8 @@ class Tamagotchi ():
     # Ereignisse und ihre Gewichtung
     ereignisse = {"krank": 10, "verletzt":10,"freudig":50, "langweilig":30 }
     ereignis = random.choices(list(ereignisse.keys()), weights=list(ereignisse.values()), k=1)[0]
-
     # Hier ist die Option, wenn das Tamagotchi älter wird ändern sich die wahrscheinlichkeiten.
     if self.alter > 10:
-
       #Hier kommt noch der zustand ruhe hinzu
       ereignisse ["ruhe"] = 10
       ereignisse ["krank"] = 20
@@ -238,7 +260,6 @@ class Tamagotchi ():
       else:
         print(f"Super! {self.name} hat richtig viel Spaß!")
 
-
     elif self.energie >= 70:
       if zufall_text == 1 :
         print(f"{self.name} hat großen Spaß mit dir und freut sich einfach.")
@@ -256,8 +277,7 @@ class Tamagotchi ():
       self.hunger += 20
       self.gesundheit += 20
       print(f"{self.name} hat  Spaß ist, aber doch erledigt.")
-    else:
-      
+    else: 
       self.energie -= 30
       self.müdigkeit += 40
       self.hunger += 30
@@ -308,6 +328,8 @@ class Tamagotchi ():
     print(f"Alter: {self.alter} {'Tag' if self.alter == 1 else 'Tage'}")   
 # Hier wird alles für das Programm eingefügt
   def start(self):
+    #Hier wird geprüft ob es ein Speicherstand gibt, wenn ja wird dieser gefragt ob er den Laden will.
+    
     richtige_eingabe = False
     while not richtige_eingabe:
       print(f"Was möchtest du mit {self.name} machen? ")
@@ -335,7 +357,7 @@ class Tamagotchi ():
         print("Deine Eingabe ist Fehlerhaft!")
     if self.stimmung == 0:
         print("ROAR")
-        print (f"{self.name} ist mega wütend. Tue was dagegen").lower()
+        print (f"{self.name} ist mega wütend. Tue was dagegen")
       #Gesundheit senken durch Wut.
         self.gesundheit -= 20
     self.älter_werden()
@@ -344,18 +366,17 @@ class Tamagotchi ():
     self.Arzt()
     self.hunger_bekommen()
     self.statuswert_nicht_unter_0_nicht_über_100()
-def begrüssung (name):
-  print(f"{name} ist ein guter Name. Kümmer dich gut um {name}.")
+  def begrüssung (self):
+    print(f"{self.name} ist ein guter Name. Kümmer dich gut um {self.name}.")
 # Hauptspiel
 def main():
     print("Hallo und Herzlich Willkommen bei meinem Tamagotchi Projekt")
-    name = input ("Wie möchtest du dein Tamagotchi nennen? ")
-    tamagotchi1 = Tamagotchi(name)
-    begrüssung(name)
+    tamagotchi1 = Tamagotchi()
+    tamagotchi1.namen_geben()
+    tamagotchi1.begrüssung()
+    tamagotchi1.laden()
     while True:
         tamagotchi1.start() #Aufruf der Start-Methode für das Tamagotchi
         if  tamagotchi1.tot(): # Beendet das Spiel, wenn der Tamagotch tot ist.
           break
 main()
-  
-
